@@ -203,7 +203,7 @@ body.dark-mode .display {
 /* =============================
    7. Currency Converter Specifics
    ============================= */
-/* Make Currency Inputs look like Calculator Display */
+
 .currency-card {
   padding: 28px;
   background: var(--bg-card);
@@ -275,7 +275,7 @@ body.dark-mode .display {
   margin-bottom: 15px;
 }
 
-/* Make the Convert Button look like the "Equal" button */
+
 .currency-converter button {
   width: 100%;
   background: var(--primary);
@@ -338,7 +338,7 @@ button:active { transform: translateY(4px); box-shadow: none; }
 button:hover { filter: brightness(0.97); }
 body.dark-mode button:hover { filter: brightness(1.2); }
 
-/* Optional Helper Classes (if used in HTML) */
+/* Optional Helper Classes */
 .btn-equal { background: var(--primary); color: white; box-shadow: 0 4px 0 var(--primary-dark); }
 .btn-operator { color: var(--primary); background: rgba(16, 185, 129, 0.1); }
 
@@ -347,7 +347,7 @@ body.dark-mode button:hover { filter: brightness(1.2); }
    ============================= */
 footer {
   grid-area: footer;
-  text-align: center;
+  text-align: right;
   padding: 15px;
   background: var(--bg-card);
   color: #6b7280;
