@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Utility Calculator App</title>
+  <link rel="stylesheet" href="./assets/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1><i class="fas fa-calculator"></i> Utility App</h1>
+    <label class="theme-toggle">
+      <input type="checkbox" id="theme-switch">
+      <span class="slider"></span>
+    </label>
+  </header>
+
+  <!-- Sidebar -->
+  <aside>
+    <button data-module="basic" class="active"><i class="fas fa-function"></i> Basic</button>
+    <button data-module="scientific"><i class="fas fa-square-root-alt"></i> Scientific</button>
+    <button data-module="currency"><i class="fas fa-dollar-sign"></i> Currency</button>
+    <button data-module="unit"><i class="fas fa-ruler-combined"></i> Unit</button>
+    <button data-module="numbersystem"><i class="fas fa-code"></i> Number System</button>
+  </aside>
+
+  <!-- Main container -->
+  <main id="module-container"></main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Utility Calculator App</p>
+  </footer>
+
+  <script type="module" src="./assets/js/app.js"></script>
+</body>
+</html>
