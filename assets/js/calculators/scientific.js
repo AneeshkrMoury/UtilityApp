@@ -3,6 +3,7 @@ export function loadScientificCalculator(container) {
     <div class="calculator scientific">
       <div class="display" id="display">0</div>
       <div class="buttons-6col">
+
         <button onclick="appendNumber('7')">7</button>
         <button onclick="appendNumber('8')">8</button>
         <button onclick="appendNumber('9')">9</button>
@@ -29,7 +30,7 @@ export function loadScientificCalculator(container) {
         <button onclick="clearDisplay()">C</button>
         <button onclick="calculate()">=</button>
         <button onclick="appendOperator('+')">+</button>
-        <button onclick="applyFunc('factorial')">x!</button>
+        <button onclick="appendOperator('!')">x!</button>
 
         <button onclick="appendNumber('3.1416')">π</button>
         <button onclick="applyPercent()">%</button>
@@ -42,6 +43,13 @@ export function loadScientificCalculator(container) {
   let currentInput = "";
   let isDeg = true;
 
+  // ⭐ Formatting (like basic calculator)
+  function formatNumber(num) {
+    if (!isFinite(num)) return "Error";
+    return parseFloat(num.toFixed(6)).toString();
+  }
+
+  // DEG/RAD toggle
   const toggleBtn = container.querySelector("#toggle-degrad");
   toggleBtn.addEventListener("click", () => {
     isDeg = !isDeg;
@@ -54,15 +62,25 @@ export function loadScientificCalculator(container) {
     display.innerText = currentInput;
   };
 
-  // Operators
+  // Operators + postfix ! support
   window.appendOperator = (op) => {
-    if (!currentInput) return;
-    const lastChar = currentInput.slice(-1);
-    if ("+-*/".includes(lastChar)) {
+    const last = currentInput.slice(-1);
+
+    // postfix factorial logic
+    if (op === "!") {
+      if (!/^[0-9.]$/.test(last)) return;
+      currentInput += "!";
+      display.innerText = currentInput;
+      return;
+    }
+
+    // prevent two operators in a row
+    if ("+-*/".includes(last)) {
       currentInput = currentInput.slice(0, -1) + op;
     } else {
       currentInput += op;
     }
+
     display.innerText = currentInput;
   };
 
@@ -72,74 +90,78 @@ export function loadScientificCalculator(container) {
     display.innerText = "0";
   };
 
-  // Scientific functions
+  // Factorial calculate
+  function factorial(n) {
+    if (n < 0) return NaN;
+    let result = 1;
+    for (let i = 2; i <= n; i++) result *= i;
+    return result;
+  }
+
+  // Replace all n! in expression
+  function processFactorials(expr) {
+    return expr.replace(/(\d+)!/g, (_, num) => factorial(Number(num)));
+  }
+
+  // Apply sin, cos, log, sqrt, etc.
   window.applyFunc = (fn) => {
     if (!currentInput) return;
-    try {
-      const match = currentInput.match(/([0-9.]+)$/);
-      if (!match) return;
-      let num = parseFloat(match[0]);
-      let result;
 
-      switch (fn) {
-        case "sin":
-          result = isDeg ? Math.sin(num * Math.PI / 180) : Math.sin(num); break;
-        case "cos":
-          result = isDeg ? Math.cos(num * Math.PI / 180) : Math.cos(num); break;
-        case "tan":
-          result = isDeg ? Math.tan(num * Math.PI / 180) : Math.tan(num); break;
-        case "log":
-          result = Math.log10(num); break;
-        case "ln":
-          result = Math.log(num); break;
-        case "sqrt":
-          result = Math.sqrt(num); break;
-        case "factorial":
-          result = 1;
-          for (let i = 1; i <= num; i++) result *= i;
-          break;
-      }
+    const match = currentInput.match(/([0-9.]+)$/);
+    if (!match) return;
 
-      currentInput = currentInput.slice(0, -match[0].length) + result;
-      display.innerText = currentInput;
-    } catch {
-      display.innerText = "Error";
-      currentInput = "";
+    let num = parseFloat(match[0]);
+    let result;
+
+    switch (fn) {
+      case "sin": result = isDeg ? Math.sin(num * Math.PI/180) : Math.sin(num); break;
+      case "cos": result = isDeg ? Math.cos(num * Math.PI/180) : Math.cos(num); break;
+      case "tan": result = isDeg ? Math.tan(num * Math.PI/180) : Math.tan(num); break;
+      case "log": result = Math.log10(num); break;
+      case "ln": result = Math.log(num); break;
+      case "sqrt": result = Math.sqrt(num); break;
+      case "factorial": result = factorial(num); break;
     }
+
+    const clean = formatNumber(result);
+
+    currentInput = currentInput.slice(0, -match[0].length) + clean;
+    display.innerText = clean;
   };
 
-  // Advanced Percentage
+  // Percent
   window.applyPercent = () => {
-    if (!currentInput) return;
-    try {
-      const match = currentInput.match(/([0-9.]+)$/);
-      if (!match) return;
-      const num = parseFloat(match[0]);
-      let percentValue = num / 100;
+    const match = currentInput.match(/([0-9.]+)$/);
+    if (!match) return;
 
-      // Check previous operator for advanced calculation
-      const operatorMatch = currentInput.match(/([0-9.]+)([+\-*/])$/);
-      if (operatorMatch) {
-        const prevNum = parseFloat(operatorMatch[1]);
-        percentValue = prevNum * (num / 100);
-      }
+    let num = parseFloat(match[0]);
+    let percent = num / 100;
 
-      currentInput = currentInput.slice(0, -match[0].length) + percentValue;
-      display.innerText = currentInput;
-    } catch {
-      display.innerText = "Error";
-      currentInput = "";
+    const opMatch = currentInput.match(/([0-9.]+)([+\-*/])$/);
+    if (opMatch) {
+      percent = parseFloat(opMatch[1]) * (num / 100);
     }
+
+    const clean = formatNumber(percent);
+
+    currentInput = currentInput.slice(0, -match[0].length) + clean;
+    display.innerText = clean;
   };
 
-  // Calculate
+  // Final calculation
   window.calculate = () => {
     if (!currentInput) return;
+
     try {
-      const expr = currentInput.replace(/π/g, "3.1416");
-      const result = Function(`"use strict"; return (${expr})`)();
-      display.innerText = result;
-      currentInput = result.toString();
+      let expr = currentInput.replace(/π/g, "3.1416");
+      expr = processFactorials(expr);
+
+      const raw = Function(`"use strict"; return (${expr})`)();
+      const clean = formatNumber(raw);
+
+      display.innerText = clean;
+      currentInput = clean.toString();
+
     } catch {
       display.innerText = "Error";
       currentInput = "";

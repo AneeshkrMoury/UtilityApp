@@ -29,7 +29,15 @@ export function loadBasicCalculator(container) {
   `;
 
   const display = container.querySelector("#display");
-  let currentInput = ""; // Stores the whole expression as string
+  let currentInput = ""; 
+
+  // ⭐ Smart number formatter
+  function formatNumber(num) {
+    if (!isFinite(num)) return "Error";
+
+    const rounded = parseFloat(num.toFixed(4));
+    return rounded.toString(); // removes trailing zeros automatically
+  }
 
   // Numbers
   container.querySelectorAll(".num").forEach(btn => {
@@ -43,7 +51,6 @@ export function loadBasicCalculator(container) {
   container.querySelectorAll(".op").forEach(btn => {
     btn.addEventListener("click", () => {
       const lastChar = currentInput.slice(-1);
-      // Prevent multiple operators in a row
       if ("+-*/".includes(lastChar)) {
         currentInput = currentInput.slice(0, -1) + btn.innerText;
       } else {
@@ -62,9 +69,11 @@ export function loadBasicCalculator(container) {
   // Equals
   container.querySelector("#equals").addEventListener("click", () => {
     try {
-      const result = eval(currentInput); // Simple evaluation
-      display.innerText = result;
-      currentInput = result.toString();
+      const result = eval(currentInput);
+      const clean = formatNumber(result);
+
+      display.innerText = clean;
+      currentInput = clean.toString();
     } catch {
       display.innerText = "Error";
       currentInput = "";
